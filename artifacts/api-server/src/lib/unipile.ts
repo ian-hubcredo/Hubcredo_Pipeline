@@ -84,7 +84,14 @@ export async function resolveLinkedInProfile(params: {
     { headers: headers() }
   );
   if (!res.ok) throw new Error(`Resolve profile failed: ${res.status}`);
-  return res.json();
+  return res.json() as Promise<{
+    provider_id: string;
+    public_identifier: string;
+    first_name: string;
+    last_name: string;
+    headline: string;
+    relation?: string;
+  }>;
 }
 
 /* ─────────────────────────────────────────────────────────────────────────── */
@@ -111,7 +118,7 @@ export async function sendLinkedInInvitation(params: {
     throw new Error((err as any).message || `Send invitation failed: ${res.status}`);
   }
 
-  return res.json();
+  return res.json() as Promise<{ object: string; identifier: string }>;
 }
 
 /* ─────────────────────────────────────────────────────────────────────────── */
@@ -206,7 +213,7 @@ async function fetchLatestMessage(chatId: string): Promise<{
       { headers: headers() }
     );
     if (!res.ok) return null;
-    const data = await res.json();
+    const data = await res.json() as { items?: UnipileMessage[] };
     const messages: UnipileMessage[] = data.items ?? [];
     for (const msg of messages) {
       if (msg.hidden || msg.is_event) continue;
@@ -231,7 +238,7 @@ async function fetchChatDisplayName(chatId: string): Promise<string | null> {
       { headers: headers() }
     );
     if (!res.ok) return null;
-    const data = await res.json();
+    const data = await res.json() as { items?: UnipileAttendee[]; attendees?: UnipileAttendee[] };
     const attendees: UnipileAttendee[] = data.items ?? data.attendees ?? [];
     const other = attendees.find((a) => a.is_me === false) ?? attendees.find((a) => !a.is_me) ?? null;
     if (!other) return null;
@@ -265,7 +272,7 @@ export async function listChats(
     throw new Error((err as any).message || `List chats failed: ${listRes.status}`);
   }
 
-  const listData = await listRes.json();
+  const listData = await listRes.json() as { items?: any[] };
   const rawChats: any[] = listData.items ?? [];
   if (rawChats.length === 0) return { items: [] };
 
@@ -317,7 +324,7 @@ export async function getChatMessages(
     throw new Error((err as any).message || `Get chat messages failed: ${res.status}`);
   }
 
-  return res.json();
+  return res.json() as Promise<{ items: UnipileMessage[] }>;
 }
 
 /* ─────────────────────────────────────────────────────────────────────────── */
@@ -351,7 +358,7 @@ export async function sendMessage(params: {
     throw new Error((err as any).message || `Send message failed: ${res.status}`);
   }
 
-  return res.json();
+  return res.json() as Promise<{ id: string; chat_id: string }>;
 }
 
 /* ─────────────────────────────────────────────────────────────────────────── */
@@ -382,5 +389,5 @@ export async function sendLinkedInMessage(params: {
     throw new Error((err as any).message || `Send message failed: ${res.status}`);
   }
 
-  return res.json();
+  return res.json() as Promise<{ object: string; chat_id: string }>;
 }

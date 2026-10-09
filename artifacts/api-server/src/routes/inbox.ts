@@ -59,7 +59,7 @@ router.get(
                 break;
               }
 
-              const data = await inboxRes.json();
+              const data = await inboxRes.json() as { items?: any[]; next_starting_after?: string };
               const items: any[] = data.items ?? [];
 
               for (const item of items) {
@@ -94,7 +94,7 @@ router.get(
               }
 
               fetched += items.length;
-              startingAfter = (data.next_starting_after as string) ?? null;
+              startingAfter = data.next_starting_after ?? null;
             } while (startingAfter && fetched < MAX_PER_CAMPAIGN);
           } catch (err) {
             console.warn(`Inbox fetch failed for campaign ${campaign.id}:`, err);
@@ -141,14 +141,14 @@ router.get(
         return;
       }
 
-      const emailData = await emailRes.json();
-      const threadId: string | null = (emailData.thread_id as string) ?? null;
+      const emailData = await emailRes.json() as { thread_id?: string; eaccount?: string; body?: any; from_address_json?: any[]; from_address_email?: string; subject?: string; timestamp_email?: string; timestamp_created?: string; is_unread?: boolean; to_address_email_list?: string; ue_type?: number; id?: string };
+      const threadId: string | null = emailData.thread_id ?? null;
 
       console.log(`Thread lookup — email ${id}, thread_id: ${threadId}`);
 
       if (!threadId) {
         // No thread_id — return just this single email
-        res.json({ thread_id: null, messages: [buildMessage(emailData, "received")] });
+        res.json({ thread_id: null, messages: [buildMessage(emailData as any, "received")] });
         return;
       }
 
@@ -177,7 +177,7 @@ router.get(
           break;
         }
 
-        const threadData = await threadRes.json();
+        const threadData = await threadRes.json() as { items?: any[]; next_starting_after?: string };
         const items: any[] = threadData.items ?? [];
 
         console.log(`Thread page: ${items.length} emails fetched`);
@@ -189,7 +189,7 @@ router.get(
           threadMessages.push(buildMessage(item, direction));
         }
 
-        startingAfter = (threadData.next_starting_after as string) ?? null;
+        startingAfter = threadData.next_starting_after ?? null;
       } while (startingAfter && threadMessages.length < 500);
 
       // Deduplicate by id (in case of overlap)
@@ -320,7 +320,7 @@ router.post(
         return;
       }
 
-      const emailData = await emailRes.json();
+      const emailData = await emailRes.json() as { eaccount?: string; thread_id?: string; from_address_json?: any[]; from_address_email?: string; subject?: string; body?: any; timestamp_email?: string; timestamp_created?: string; is_unread?: boolean; to_address_email_list?: string; ue_type?: number; id?: string };
 
       // Step 2: Resolve eaccount — three fallback strategies
       let eaccount = "";
@@ -343,7 +343,7 @@ router.post(
           { headers: { Authorization: `Bearer ${INSTANTLY_API_KEY}` } }
         );
         if (threadRes.ok) {
-          const threadData = await threadRes.json();
+          const threadData = await threadRes.json() as { items?: any[] };
           const sentEmails: any[] = threadData.items ?? [];
           const sentEmail = sentEmails.find(
             (e: any) => e.eaccount && typeof e.eaccount === "string" && e.eaccount.includes("@")
@@ -359,7 +359,7 @@ router.post(
           { headers: { Authorization: `Bearer ${INSTANTLY_API_KEY}` } }
         );
         if (acctRes.ok) {
-          const acctData = await acctRes.json();
+          const acctData = await acctRes.json() as { items?: any[] };
           const accounts: any[] = acctData.items ?? [];
           if (accounts.length > 0 && accounts[0].email) {
             eaccount = accounts[0].email as string;
@@ -401,7 +401,7 @@ router.post(
         return;
       }
 
-      const data = await replyRes.json();
+      const data = await replyRes.json() as Record<string, unknown>;
       res.json({ success: true, eaccount, data });
     } catch (err: any) {
       console.error("REPLY ERROR:", err);

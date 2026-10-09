@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearch } from "wouter";
 import { Loader2 } from "lucide-react";
 
 export default function AttioCallback() {
-  const [searchParams] = useSearchParams();
+  const search = useSearch();
+  const searchParams = new URLSearchParams(search);
   const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
   const [message, setMessage] = useState("");
 

@@ -3,9 +3,10 @@ import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import path from "path";
 import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
+import { apiServerPlugin } from "./vite-plugin-api-server";
 
 const port = Number(process.env.PORT) || 5173;
-const apiPort = Number(process.env.API_PORT) || 3001;
+const apiPort = Number(process.env.API_PORT) || 8080;
 const basePath = process.env.BASE_PATH || "/";
 
 export default defineConfig({
@@ -14,6 +15,7 @@ export default defineConfig({
     react(),
     tailwindcss(),
     runtimeErrorOverlay(),
+    apiServerPlugin(),
   ],
   resolve: {
     alias: {

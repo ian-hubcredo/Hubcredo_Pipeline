@@ -128,7 +128,7 @@ router.post("/linkedin/connect/webhook", async (req, res): Promise<void> => {
   try {
     let profileName: string | null = null;
     try {
-      const acct = await getUnipileAccount(account_id);
+      const acct = await getUnipileAccount(account_id) as { name?: string } | null;
       profileName = acct?.name || null;
     } catch { /* non-critical */ }
 
@@ -351,7 +351,7 @@ router.get(
       }
 
       // v3 returns a plain array, NOT nested under a key
-      const raw = await response.json();
+      const raw = await response.json() as any[] | { items?: any[]; accounts?: any[] };
       const accounts: any[] = Array.isArray(raw) ? raw : raw.items ?? raw.accounts ?? [];
 
       if (accounts.length === 0) {
@@ -938,7 +938,7 @@ router.get(
     }
 
     try {
-      const result = await getChatMessages(chatId, 50);
+      const result = await getChatMessages(String(chatId), 50);
       const messages = (result.items ?? []).reverse();
       res.json({ messages });
     } catch (err: any) {
@@ -980,7 +980,7 @@ router.post(
     }
 
     try {
-      const result = await sendMessage({ chatId, text: text.trim() });
+      const result = await sendMessage({ chatId: String(chatId), text: text.trim() });
       res.json({ success: true, message_id: result.id });
     } catch (err: any) {
       req.log.warn({ err }, "Failed to send LinkedIn message");

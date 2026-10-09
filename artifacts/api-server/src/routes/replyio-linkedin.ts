@@ -805,7 +805,7 @@ router.get(
       return;
     }
 
-    const seqId = req.params.id;
+    const seqId = String(req.params.id);
     const sequenceIdNum = parseInt(seqId, 10);
 
     if (isNaN(sequenceIdNum)) {

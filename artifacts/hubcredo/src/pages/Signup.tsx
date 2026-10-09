@@ -5,7 +5,7 @@ import { getSupabase } from "@/lib/supabase";
 import { setToken } from "@/lib/auth";
 import { useToast } from "@/hooks/use-toast";
 
-const API_URL = import.meta.env.VITE_API_URL || "https://lead-stack-engine.onrender.com";
+const API_URL = import.meta.env.VITE_API_URL || "";
 
 export default function Signup() {
   const [, setLocation] = useLocation();

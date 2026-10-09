@@ -184,19 +184,19 @@ router.get("/crm/people", requireAuth, async (req: AuthenticatedRequest, res) =>
 
 router.get("/crm/people/:id", requireAuth, async (req: AuthenticatedRequest, res) => {
   const key = requireApiKey(res); if (!key) return;
-  try { res.json(await People.get(key, req.params.id)); }
+  try { res.json(await People.get(key, String(req.params.id))); }
   catch (err) { handleAttioError(err, res); }
 });
 
 router.patch("/crm/people/:id", requireAuth, async (req: AuthenticatedRequest, res) => {
   const key = requireApiKey(res); if (!key) return;
-  try { res.json(await People.update(key, req.params.id, req.body.values)); }
+  try { res.json(await People.update(key, String(req.params.id), req.body.values)); }
   catch (err) { handleAttioError(err, res); }
 });
 
 router.delete("/crm/people/:id", requireAuth, async (req: AuthenticatedRequest, res) => {
   const key = requireApiKey(res); if (!key) return;
-  try { await People.delete(key, req.params.id); res.json({ success: true }); }
+  try { await People.delete(key, String(req.params.id)); res.json({ success: true }); }
   catch (err) { handleAttioError(err, res); }
 });
 
@@ -234,7 +234,7 @@ router.get("/crm/lists/:id/entries", requireAuth, async (req: AuthenticatedReque
   const key = requireApiKey(res); if (!key) return;
   const { limit = "50", offset = "0" } = req.query as Record<string, string>;
   try {
-    res.json(await Lists.entries(key, req.params.id, {
+    res.json(await Lists.entries(key, String(req.params.id), {
       limit: parseInt(limit),
       offset: parseInt(offset),
     }));
@@ -245,14 +245,14 @@ router.post("/crm/lists/:id/entries", requireAuth, async (req: AuthenticatedRequ
   const key = requireApiKey(res); if (!key) return;
   const { target_object, record_id } = req.body as { target_object: string; record_id: string };
   try {
-    res.status(201).json({ entry_id: await Lists.addEntry(key, req.params.id, target_object, record_id) });
+    res.status(201).json({ entry_id: await Lists.addEntry(key, String(req.params.id), target_object, record_id) });
   } catch (err) { handleAttioError(err, res); }
 });
 
 router.patch("/crm/lists/:listId/entries/:entryId", requireAuth, async (req: AuthenticatedRequest, res) => {
   const key = requireApiKey(res); if (!key) return;
   try {
-    await Lists.updateEntry(key, req.params.listId, req.params.entryId, req.body.values);
+    await Lists.updateEntry(key, String(req.params.listId), String(req.params.entryId), req.body.values);
     res.json({ success: true });
   } catch (err) { handleAttioError(err, res); }
 });
@@ -260,7 +260,7 @@ router.patch("/crm/lists/:listId/entries/:entryId", requireAuth, async (req: Aut
 router.delete("/crm/lists/:listId/entries/:entryId", requireAuth, async (req: AuthenticatedRequest, res) => {
   const key = requireApiKey(res); if (!key) return;
   try {
-    await Lists.removeEntry(key, req.params.listId, req.params.entryId);
+    await Lists.removeEntry(key, String(req.params.listId), String(req.params.entryId));
     res.json({ success: true });
   } catch (err) { handleAttioError(err, res); }
 });
@@ -291,7 +291,7 @@ router.post("/crm/notes", requireAuth, async (req: AuthenticatedRequest, res) =>
 
 router.delete("/crm/notes/:id", requireAuth, async (req: AuthenticatedRequest, res) => {
   const key = requireApiKey(res); if (!key) return;
-  try { await Notes.delete(key, req.params.id); res.json({ success: true }); }
+  try { await Notes.delete(key, String(req.params.id)); res.json({ success: true }); }
   catch (err) { handleAttioError(err, res); }
 });
 
@@ -334,13 +334,13 @@ router.post("/crm/tasks", requireAuth, async (req: AuthenticatedRequest, res) =>
 
 router.patch("/crm/tasks/:id/complete", requireAuth, async (req: AuthenticatedRequest, res) => {
   const key = requireApiKey(res); if (!key) return;
-  try { await Tasks.complete(key, req.params.id); res.json({ success: true }); }
+  try { await Tasks.complete(key, String(req.params.id)); res.json({ success: true }); }
   catch (err) { handleAttioError(err, res); }
 });
 
 router.delete("/crm/tasks/:id", requireAuth, async (req: AuthenticatedRequest, res) => {
   const key = requireApiKey(res); if (!key) return;
-  try { await Tasks.delete(key, req.params.id); res.json({ success: true }); }
+  try { await Tasks.delete(key, String(req.params.id)); res.json({ success: true }); }
   catch (err) { handleAttioError(err, res); }
 });
 
@@ -348,13 +348,13 @@ router.delete("/crm/tasks/:id", requireAuth, async (req: AuthenticatedRequest, r
 
 router.get("/crm/attributes/:objectSlug", requireAuth, async (req: AuthenticatedRequest, res) => {
   const key = requireApiKey(res); if (!key) return;
-  try { res.json({ attributes: await Attributes.list(key, req.params.objectSlug) }); }
+  try { res.json({ attributes: await Attributes.list(key, String(req.params.objectSlug)) }); }
   catch (err) { handleAttioError(err, res); }
 });
 
 router.post("/crm/attributes/:objectSlug", requireAuth, async (req: AuthenticatedRequest, res) => {
   const key = requireApiKey(res); if (!key) return;
-  try { res.status(201).json(await Attributes.create(key, req.params.objectSlug, req.body)); }
+  try { res.status(201).json(await Attributes.create(key, String(req.params.objectSlug), req.body)); }
   catch (err) { handleAttioError(err, res); }
 });
 
@@ -375,7 +375,7 @@ router.post("/crm/webhooks", requireAuth, async (req: AuthenticatedRequest, res)
 
 router.delete("/crm/webhooks/:id", requireAuth, async (req: AuthenticatedRequest, res) => {
   const key = requireApiKey(res); if (!key) return;
-  try { await Webhooks.delete(key, req.params.id); res.json({ success: true }); }
+  try { await Webhooks.delete(key, String(req.params.id)); res.json({ success: true }); }
   catch (err) { handleAttioError(err, res); }
 });
 
@@ -385,7 +385,7 @@ router.post("/crm/sync/lead/:id", requireAuth, async (req: AuthenticatedRequest,
   const key = requireApiKey(res); if (!key) return;
   const { data: lead } = await supabase
     .from("leads").select("*")
-    .eq("id", req.params.id).eq("user_id", req.userId!).single();
+    .eq("id", String(req.params.id)).eq("user_id", req.userId!).single();
   if (!lead) { res.status(404).json({ error: "Lead not found" }); return; }
 
   const mapping = await getFieldMapping(req.userId!);
@@ -450,7 +450,7 @@ router.post("/crm/sync-list/:listId", requireAuth, async (req: AuthenticatedRequ
   const { data: leads } = await supabase
     .from("leads").select("*")
     .eq("user_id", req.userId!)
-    .eq("lead_list_id", req.params.listId)
+    .eq("lead_list_id", String(req.params.listId))
     .eq("review_status", "approved");
 
   if (!leads?.length) { res.json({ total: 0, succeeded: 0, failed: 0 }); return; }

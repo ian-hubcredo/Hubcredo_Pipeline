@@ -52,7 +52,7 @@ router.get("/inboxkit/validate", requireAuth, async (req: AuthenticatedRequest, 
     const response = await fetch(`${INBOXKIT_BASE}/billing/wallet`, {
       headers: inboxkitHeaders(apiKey, workspaceId),
     });
-    const data = await response.json();
+    const data = await response.json() as { credits_remaining?: number; total_credits?: number; credits_used?: number };
     if (!response.ok) {
       res.json({ connected: false, error: `InboxKit returned ${response.status}`, detail: data });
       return;
@@ -89,7 +89,7 @@ router.get("/inboxkit/domains", requireAuth, async (req: AuthenticatedRequest, r
       headers: inboxkitHeaders(apiKey, workspaceId),
       body: JSON.stringify({ page: 1, limit: 100 }),
     });
-    const data = await response.json();
+    const data = await response.json() as { domains?: any[]; total?: number; status_counts?: Record<string, number>; nameserver_status_counts?: Record<string, number>; message?: string };
     if (!response.ok) {
       res.status(response.status).json({ error: data?.message ?? "Failed to fetch domains" });
       return;
@@ -132,7 +132,7 @@ router.get("/inboxkit/mailboxes", requireAuth, async (req: AuthenticatedRequest,
       headers: inboxkitHeaders(apiKey, workspaceId),
       body: JSON.stringify(body),
     });
-    const data = await response.json();
+    const data = await response.json() as { mailboxes?: any[]; total?: number; message?: string };
     if (!response.ok) {
       res.status(response.status).json({ error: data?.message ?? "Failed to fetch mailboxes" });
       return;
@@ -167,7 +167,7 @@ router.get("/inboxkit/mailboxes/by-domain", requireAuth, async (req: Authenticat
       headers: inboxkitHeaders(apiKey, workspaceId),
       body: JSON.stringify({ page: 1, limit: 100, domain }),
     });
-    const data = await response.json();
+    const data = await response.json() as { mailboxes?: any[]; total?: number; message?: string };
     if (!response.ok) {
       res.status(response.status).json({ error: data?.message ?? "Failed to fetch mailboxes" });
       return;

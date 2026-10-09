@@ -1,8 +1,5 @@
 import React, { useState } from "react";
 
-// Route this at /apply/job in your router (App.tsx)
-// e.g. <Route path="/apply/job" component={ApplyJobPage} />
-
 const WEBHOOK_URL = "https://shreyahubcredo.app.n8n.cloud/webhook/apply-job";
 
 const COUNTRY_CODES = [
@@ -16,7 +13,12 @@ const PHONE_REGEX = /^\d{10}$/;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const LINKEDIN_REGEX = /^https?:\/\/(www\.)?linkedin\.com\/.+$/i;
 
-function validateField(field, value) {
+type FormField = "firstName" | "lastName" | "email" | "countryCode" | "phone" | "linkedin";
+type FormState = Record<FormField, string>;
+type FieldErrors = Record<FormField, string>;
+type Touched = Record<FormField, boolean>;
+
+function validateField(field: FormField, value: string): string {
   switch (field) {
     case "firstName":
       if (!value.trim()) return "First name is required.";
@@ -47,7 +49,7 @@ function validateField(field, value) {
 }
 
 export default function ApplyJobPage() {
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<FormState>({
     firstName: "",
     lastName: "",
     email: "",
@@ -55,17 +57,17 @@ export default function ApplyJobPage() {
     phone: "",
     linkedin: "",
   });
-  const [fieldErrors, setFieldErrors] = useState({});
-  const [touched, setTouched] = useState({});
-  const [resume, setResume] = useState(null);
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({} as FieldErrors);
+  const [touched, setTouched] = useState<Touched>({} as Touched);
+  const [resume, setResume] = useState<File | null>(null);
   const [fileName, setFileName] = useState("");
-  const [status, setStatus] = useState("idle"); // idle | submitting | success | error
+  const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
   const [formError, setFormError] = useState("");
 
-  const update = (field) => (e) => {
+  const update = (field: FormField) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     let value = e.target.value;
     if (field === "phone") {
-      value = value.replace(/\D/g, "").slice(0, 10); // digits only, max 10
+      value = value.replace(/\D/g, "").slice(0, 10);
     }
     setForm((f) => ({ ...f, [field]: value }));
     if (touched[field]) {
@@ -73,12 +75,12 @@ export default function ApplyJobPage() {
     }
   };
 
-  const handleBlur = (field) => () => {
+  const handleBlur = (field: FormField) => () => {
     setTouched((t) => ({ ...t, [field]: true }));
     setFieldErrors((fe) => ({ ...fe, [field]: validateField(field, form[field]) }));
   };
 
-  const handleFile = (e) => {
+  const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     if (file.type !== "application/pdf") {
@@ -91,17 +93,17 @@ export default function ApplyJobPage() {
   };
 
   const runFullValidation = () => {
-    const fields = ["firstName", "lastName", "email", "phone", "linkedin"];
-    const errors = {};
+    const fields: FormField[] = ["firstName", "lastName", "email", "phone", "linkedin"];
+    const errors = {} as FieldErrors;
     fields.forEach((f) => {
       errors[f] = validateField(f, form[f]);
     });
     setFieldErrors(errors);
-    setTouched(fields.reduce((acc, f) => ({ ...acc, [f]: true }), {}));
+    setTouched(fields.reduce((acc, f) => ({ ...acc, [f]: true }), {} as Touched));
     return Object.values(errors).every((v) => !v);
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const isValid = runFullValidation();
@@ -293,7 +295,7 @@ export default function ApplyJobPage() {
 
             <form onSubmit={handleSubmit} noValidate>
               <div className="ajp-row">
-                <Field label="First name" error={touched.firstName && fieldErrors.firstName}>
+                <Field label="First name" error={touched.firstName ? fieldErrors.firstName : undefined}>
                   <input
                     className={`ajp-input ${touched.firstName && fieldErrors.firstName ? "ajp-input-error" : ""}`}
                     placeholder="Enter your first name"
@@ -302,7 +304,7 @@ export default function ApplyJobPage() {
                     onBlur={handleBlur("firstName")}
                   />
                 </Field>
-                <Field label="Last name" error={touched.lastName && fieldErrors.lastName}>
+                <Field label="Last name" error={touched.lastName ? fieldErrors.lastName : undefined}>
                   <input
                     className={`ajp-input ${touched.lastName && fieldErrors.lastName ? "ajp-input-error" : ""}`}
                     placeholder="Enter your last name"
@@ -313,7 +315,7 @@ export default function ApplyJobPage() {
                 </Field>
               </div>
 
-              <Field label="Email" error={touched.email && fieldErrors.email}>
+              <Field label="Email" error={touched.email ? fieldErrors.email : undefined}>
                 <input
                   type="email"
                   className={`ajp-input ${touched.email && fieldErrors.email ? "ajp-input-error" : ""}`}
@@ -324,7 +326,7 @@ export default function ApplyJobPage() {
                 />
               </Field>
 
-              <Field label="Phone number" error={touched.phone && fieldErrors.phone}>
+              <Field label="Phone number" error={touched.phone ? fieldErrors.phone : undefined}>
                 <div style={{ display: "flex", gap: 8 }}>
                   <select
                     value={form.countryCode}
@@ -351,7 +353,7 @@ export default function ApplyJobPage() {
                 </div>
               </Field>
 
-              <Field label="LinkedIn profile URL" error={touched.linkedin && fieldErrors.linkedin}>
+              <Field label="LinkedIn profile URL" error={touched.linkedin ? fieldErrors.linkedin : undefined}>
                 <input
                   className={`ajp-input ${touched.linkedin && fieldErrors.linkedin ? "ajp-input-error" : ""}`}
                   placeholder="https://linkedin.com/in/your-profile"
@@ -361,7 +363,7 @@ export default function ApplyJobPage() {
                 />
               </Field>
 
-              <Field label="Upload your resume (in English)">
+              <Field label="Upload your resume (in English)" error={undefined}>
                 <label className="ajp-upload">
                   ⬆ {fileName || "Click to upload or drag & drop (.pdf)"}
                   <input
@@ -420,7 +422,7 @@ function SuccessState() {
   );
 }
 
-function Field({ label, error, children }) {
+function Field({ label, error, children }: { label: string; error?: string; children: React.ReactNode }) {
   return (
     <div className={`ajp-field ${error ? "ajp-field-error" : ""}`}>
       <label className="ajp-label">{label}</label>

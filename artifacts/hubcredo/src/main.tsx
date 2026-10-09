@@ -5,7 +5,7 @@ import { setAuthTokenGetter, setBaseUrl } from "@workspace/api-client-react";
 import { getToken } from "./lib/auth";
 
 // Set API base URL for API client
-const apiUrl = import.meta.env.VITE_API_URL || "https://lead-stack-engine.onrender.com";
+const apiUrl = import.meta.env.VITE_API_URL || "";
 setBaseUrl(apiUrl);
 
 

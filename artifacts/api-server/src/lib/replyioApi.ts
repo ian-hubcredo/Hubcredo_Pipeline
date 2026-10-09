@@ -11,8 +11,8 @@ async function apiFetch<T>(method: string, path: string, body?: unknown): Promis
     headers: { "Content-Type": "application/json" },
     ...(body ? { body: JSON.stringify(body) } : {}),
   });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data?.error ?? `Request failed: ${res.status}`);
+  const data = await res.json() as Record<string, unknown>;
+  if (!res.ok) throw new Error((data?.error as string) ?? `Request failed: ${res.status}`);
   return data as T;
 }
 

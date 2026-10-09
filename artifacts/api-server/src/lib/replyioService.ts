@@ -246,7 +246,7 @@ export async function validateApiKey(): Promise<{
     };
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
-    logger.error("Reply.io validateApiKey failed:", msg);
+    logger.error({ msg }, "Reply.io validateApiKey failed");
     return { valid: false, error: msg };
   }
 }
