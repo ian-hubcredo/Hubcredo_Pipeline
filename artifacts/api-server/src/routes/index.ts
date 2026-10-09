@@ -1,0 +1,55 @@
+import { Router, type IRouter } from "express";
+import healthRouter from "./health";
+import authRouter from "./auth";
+import analysesRouter from "./analyses";
+import icpsRouter from "./icps";
+import settingsRouter from "./settings";
+import stacksRouter from "./stacks";
+import leadsRouter from "./leads";
+import dashboardRouter from "./dashboard";
+import webhooksRouter from "./webhooks";
+import toolsRouter from "./tools";
+import domainsRouter from "./domains";
+import inboxkitRouter from "./inboxkit";
+import contactsRouter from "./contacts";
+import billingRouter from "./billing";
+import campaignsRouter from "./campaigns";
+import linkedinRouter from "./linkedin";
+import crmRouter from "./crm";
+import inboxRouter from "./inbox";
+import replyioRouter from "./replyio";
+import hubspotRouter from "./crm-hubspot";
+import templatesRouter from "./templates";
+import replyioLinkedinRouter from "./replyio-linkedin";
+import elevenLabsRouter from "./elevenlabs";
+import recruitRouter from "./recruit";
+
+
+const router: IRouter = Router();
+
+router.use(healthRouter);
+router.use(authRouter);
+router.use(analysesRouter);
+router.use(icpsRouter);
+router.use(settingsRouter);
+router.use(stacksRouter);
+router.use(leadsRouter);
+router.use(dashboardRouter);
+router.use(webhooksRouter);
+router.use(toolsRouter);
+router.use(domainsRouter);
+router.use(inboxkitRouter);
+router.use(contactsRouter);
+router.use(billingRouter);
+router.use(campaignsRouter);
+router.use(linkedinRouter);
+router.use(crmRouter);
+router.use(inboxRouter);
+router.use(replyioRouter);
+router.use(hubspotRouter);
+router.use(templatesRouter);
+router.use(replyioLinkedinRouter);
+router.use(elevenLabsRouter);
+router.use(recruitRouter);
+
+export default router;
